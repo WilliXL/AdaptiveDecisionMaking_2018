@@ -79,6 +79,59 @@ def plot_ddm_sims(df, parameters, traces=None, plot_v=False, fig=None, colors=No
     return f
 
 
+def plot_my_rts(df, parameters, f, colors=None, kdeplot=True): ### helper function for plot_this_sims
+
+    a, trSteps, v, zStart, si, dx, dt, deadline = convert_params(parameters)
+    
+    rt0 = df.rt.values / dt
+
+    if colors is None:
+        colors = [ '#e5344a','#3572C6']
+    ax, axx1, axx2 = f.axes
+    clip = (df.rt.min()/dt, deadline)
+
+    if kdeplot:
+        #sns.kdeplot(rt1, alpha=.5, linewidth=0, color=colors[0], ax=axx1, shade=True, clip=clip, bw=15)
+        sns.kdeplot(rt0, alpha=.5, linewidth=0, color=colors[1], ax=axx1, shade=True, clip=clip, bw=15)
+
+        ymax = (.005, .01)
+        #if rt1.size < rt0.size:
+        #    ymax = (.01, .005)
+        axx1.set_ylim(0, ymax[0])
+        axx2.set_ylim(ymax[1], 0.0)
+        # axx2.invert_yaxis()
+
+    else:
+        #sns.distplot(rt1, color=colors[0], ax=axx1, kde=False, norm_hist=False)
+        sns.distplot(rt0, color=colors[1], ax=axx1, kde=False, norm_hist=False)
+
+
+
+def plot_this_sims(df, parameters, traces=None, plot_v=False, fig=None, colors=None, vcolor='k', kdeplot=True): 
+    #############USE FOR PLOTTTING
+
+
+    maxtime = df.rt.max()
+    a, trSteps, v, zStart, si, dx, dt, deadline = convert_params(parameters, maxtime)
+
+    if colors is None:
+        colors = ['#e5344a','#3572C6']
+    if fig is None:
+        f, axes = build_ddm_axis(parameters, maxtime)
+    else:
+        f = fig; axes = fig.axes
+
+    plot_my_rts(df, parameters, f=f, colors=colors, kdeplot=kdeplot)
+
+    if traces is not None:
+        plot_traces(df, parameters, traces, f=f, colors=colors)
+
+    if plot_v:
+        plot_drift_line(df, parameters, color=vcolor, ax=f.axes[0])
+
+    return f
+
+
 def compare_drift_effects(df, param_list):
 
     sDF = df[df.stim=='signal']
@@ -104,6 +157,12 @@ def compare_drift_effects(df, param_list):
         ymax, ymin = axx2.get_ylim()[::-1]
         axx1.set_ylim(ymax, ymin)
     return ax
+
+
+
+
+
+
 
 
 def plot_bound_rts(df, parameters, f, colors=None, kdeplot=True):
