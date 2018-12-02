@@ -199,11 +199,11 @@ def plot_traces(df, parameters, traces, f, colors):
     ntrials = int(traces.shape[0])
     for i in range(ntrials):
         trace = traces[i]
-        c = colors[0]
+        c = colors[1]
         nsteps = np.argmax(trace[trace<=a]) + 2
         if df.iloc[i]['choice']==0:
         # if trace[nsteps]<zStart:
-            c = colors[1]
+            c = colors[0]
             nsteps = np.argmin(trace[trace>=0]) + 2
         ax.plot(np.arange(trSteps, trSteps + nsteps), traces[i, :nsteps], color=c, alpha=.1)
 
